@@ -1,6 +1,6 @@
-From ubuntu
+FROM ubuntu
 USER root
-Run apt update && apt install python-pip -y
+RUN apt update && apt install python-pip -y
 RUN pip install flask flask_caching
 COPY main.py ./
 EXPOSE 8000
