@@ -10,11 +10,11 @@ RUN pip3 install flask flask-caching
 # 设置工作目录
 WORKDIR /app
 
-# 将项目文件复制到容器中
-COPY . /app
+# 复制应用程序文件到容器中
+COPY main.py /app/main.py
 
 # 暴露端口
 EXPOSE 8000
 
 # 启动应用程序
-CMD ["python3", "main.py"]
+CMD ["python3", "/app/main.py"]
