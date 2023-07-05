@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM python:latest
 USER root
 # 安装系统依赖
 RUN apt-get update \
