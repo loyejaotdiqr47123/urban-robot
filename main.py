@@ -1,28 +1,26 @@
-from flask import Flask, request, make_response
 import requests
+from flask import Flask, request, Response
 
 app = Flask(__name__)
 
-# 反代和替换功能
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def proxy(path):
-    # 构建目标URL
-    url = 'https://cdn.jsdelivr.net/' + path
-    
-    # 发送请求
-    response = requests.get(url, stream=True)
-    
-    # 构建响应对象
-    resp = make_response(response.content)
-    
-    # 替换响应内容中的域名
-    resp.set_data(resp.get_data().replace(b'cdn.jsdelivr.net', b'jsdelivr.bobocdn.tk'))
-    
-    # 设置响应头
-    for name, value in response.headers.items():
-        resp.headers[name] = value
-    
+    url = f'https://cdn.jsdelivr.net/{path}'
+    headers = {key: value for (key, value) in request.headers if key != 'Host'}
+    response = requests.request(
+        method=request.method,
+        url=url,
+        headers=headers,
+        data=request.get_data(),
+        cookies=request.cookies,
+        allow_redirects=False
+    )
+    resp = Response(response.content, status=response.status_code, headers=dict(response.headers))
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    resp.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    resp.headers['Content-Type'] = response.headers['Content-Type'].replace('cdn.jsdelivr.net', 'jsdelivr.bobocdn.tk')
     return resp
 
 if __name__ == '__main__':
